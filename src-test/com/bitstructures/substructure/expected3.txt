@@ -1,0 +1,5 @@
+<p>first paragraph</p>
+
+<pre><code>code block</code></pre>
+
+<p>second paragraph</p>
