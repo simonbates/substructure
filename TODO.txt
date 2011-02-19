@@ -1,0 +1,9 @@
+* licenses for jars in lib and lib-test
+* use Google Guava
+	* use Resources to read in test data
+	* use Files to read in site data
+* move MarkupParserState into MarkupParser -- can introduce a service later if need something stateless to inject
+	String input;
+	MarkupParser parser = new MarkupParser();
+	parser.setInput(input);
+	String html = parser.parse();
