@@ -1,0 +1,6 @@
+asm-3.0.jar				Cobertura 1.9.4.1	http://cobertura.sourceforge.net/
+asm-tree-3.0.jar		Cobertura 1.9.4.1	http://cobertura.sourceforge.net/
+cobertura.jar			Cobertura 1.9.4.1	http://cobertura.sourceforge.net/
+jakarta-oro-2.0.8.jar	Cobertura 1.9.4.1	http://cobertura.sourceforge.net/
+junit-4.8.2.jar			JUnit 4.8.2			http://www.junit.org/
+log4j-1.2.9.jar			Cobertura 1.9.4.1	http://cobertura.sourceforge.net/

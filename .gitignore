@@ -1,1 +1,7 @@
 /bin
+/build
+/build-test
+/build-instrumented
+/test-reports
+/cobertura.ser
+/coverage-report
