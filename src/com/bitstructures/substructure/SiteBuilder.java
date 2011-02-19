@@ -27,7 +27,8 @@ public class SiteBuilder {
 	}
 	
 	public static void main(String[] args) {
-		Injector injector = Guice.createInjector(new SiteBuilderModule());
+		String pageSourceDir = "testDir";
+		Injector injector = Guice.createInjector(new SiteBuilderModule(pageSourceDir));
 		SiteBuilder siteBuilder = injector.getInstance(SiteBuilder.class);
 		siteBuilder.buildSite();
 	}
