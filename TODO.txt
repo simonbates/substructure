@@ -7,3 +7,4 @@
 	MarkupParser parser = new MarkupParser();
 	parser.setInput(input);
 	String html = parser.parse();
+* move classification of lines into Tokeniser and return tokens: (enum TokenType, String contents)
