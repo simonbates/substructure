@@ -1,6 +1,3 @@
-* use Google Guava
-	* use Resources to read in test data
-	* use Files to read in site data
 * move MarkupParserState into MarkupParser -- can introduce a service later if need something stateless to inject
 	String input;
 	MarkupParser parser = new MarkupParser();
@@ -8,3 +5,5 @@
 	String html = parser.parse();
 * move classification of lines into Tokeniser and return tokens: (enum TokenType, String contents)
 * change MarkupParser to recursive descent style
+* Gradle
+* FindBugs

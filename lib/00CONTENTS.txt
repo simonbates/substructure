@@ -1,3 +1,4 @@
 aopalliance.jar			Guice 2.0			http://code.google.com/p/google-guice/
+guava-r08.jar			Guava Release 08	http://code.google.com/p/guava-libraries/
 guice-2.0.jar			Guice 2.0			http://code.google.com/p/google-guice/
 joda-time-1.6.2.jar		Joda Time 1.6.2		http://joda-time.sourceforge.net/
