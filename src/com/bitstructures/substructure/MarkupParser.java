@@ -10,12 +10,19 @@ public class MarkupParser {
 	private static final String PARAGRAPH_END = "</p>";
 	private static final String CODE_BLOCK_START = "<pre><code>";
 	private static final String CODE_BLOCK_END = "</code></pre>";
+	
+	private Reader input;
+	private boolean isInParagraph;
+	private boolean isInCodeBlock;
+	
+	public void setInput(Reader input) {
+		this.input = input;
+	}
 
-	public String parse(Reader markupReader) throws IOException {
-		LineTokenizer lineTokenizer = new LineTokenizer(markupReader);
-		MarkupParserState markupParserState = new MarkupParserState();
-		markupParserState.setInParagraph(false);
-		markupParserState.setInCodeBlock(false);
+	public String parse() throws IOException {
+		LineTokenizer lineTokenizer = new LineTokenizer(input);
+		isInParagraph = false;
+		isInCodeBlock = false;
 		StringBuffer html = new StringBuffer();
 		lineTokenizer.readNext();
 		while (!lineTokenizer.isAtEnd()) {
@@ -24,9 +31,9 @@ public class MarkupParser {
 			if (isBlank(currentLine)) {
 				doBlank(html, currentLine);
 			} else if (isCodeBlockLine(currentLine)) {
-				doCodeBlockLine(markupParserState, html, currentLine, lookAheadLine);
+				doCodeBlockLine(html, currentLine, lookAheadLine);
 			} else {
-				doNonBlank(markupParserState, html, currentLine, lookAheadLine);
+				doNonBlank(html, currentLine, lookAheadLine);
 			}
 			lineTokenizer.readNext();
 		}
@@ -45,12 +52,12 @@ public class MarkupParser {
 		html.append(currentLine + "\n");
 	}
 	
-	private void doCodeBlockLine(MarkupParserState markupParserState, StringBuffer html, String currentLine, String lookAheadLine) {
+	private void doCodeBlockLine(StringBuffer html, String currentLine, String lookAheadLine) {
 		String processedLine = processCodeBlockLine(currentLine);
-		if (markupParserState.isInCodeBlock()) {
+		if (isInCodeBlock) {
 			if (isBlank(lookAheadLine)) {
 				html.append(processedLine + CODE_BLOCK_END + "\n");
-				markupParserState.setInCodeBlock(false);
+				isInCodeBlock = false;
 			} else {
 				html.append(processedLine + "\n");
 			}
@@ -59,7 +66,7 @@ public class MarkupParser {
 				html.append(CODE_BLOCK_START + processedLine + CODE_BLOCK_END + "\n");
 			} else {
 				html.append(CODE_BLOCK_START + processedLine + "\n");
-				markupParserState.setInCodeBlock(true);
+				isInCodeBlock = true;
 			}
 		}
 	}
@@ -69,11 +76,11 @@ public class MarkupParser {
 		return currentLine.substring(CODE_BLOCK_LINE_PREFIX.length());
 	}
 
-	private void doNonBlank(MarkupParserState markupParserState, StringBuffer html, String currentLine, String lookAheadLine) {
-		if (markupParserState.isInParagraph()) {
+	private void doNonBlank(StringBuffer html, String currentLine, String lookAheadLine) {
+		if (isInParagraph) {
 			if (isBlank(lookAheadLine)) {
 				html.append(currentLine + PARAGRAPH_END + "\n");
-				markupParserState.setInParagraph(false);
+				isInParagraph = false;
 			} else {
 				html.append(currentLine + "\n");
 			}
@@ -82,7 +89,7 @@ public class MarkupParser {
 				html.append(PARAGRAPH_START + currentLine + PARAGRAPH_END + "\n");
 			} else {
 				html.append(PARAGRAPH_START + currentLine + "\n");
-				markupParserState.setInParagraph(true);
+				isInParagraph = true;
 			}
 		}
 	}

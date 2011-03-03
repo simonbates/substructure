@@ -36,7 +36,8 @@ public class MarkupParserTest extends Assert {
 			} else {
 				StringReader markupReader = new StringReader(markup);
 				String expected = getContents(EXPECTED_FILE_NAME_TEMPLATE, n);
-				assertEquals(expected, markupParser.parse(markupReader));
+				markupParser.setInput(markupReader);
+				assertEquals(expected, markupParser.parse());
 				n++;
 			}
 		}
