@@ -5,93 +5,68 @@ import java.io.Reader;
 
 public class MarkupParser {
 	
-	private static final String CODE_BLOCK_LINE_PREFIX = "    ";
 	private static final String PARAGRAPH_START = "<p>";
 	private static final String PARAGRAPH_END = "</p>";
 	private static final String CODE_BLOCK_START = "<pre><code>";
 	private static final String CODE_BLOCK_END = "</code></pre>";
-	
-	private Reader input;
-	private boolean isInParagraph;
-	private boolean isInCodeBlock;
+
+	LineTokenizer lineTokenizer;
+	StringBuffer html;
 	
 	public void setInput(Reader input) {
-		this.input = input;
+		lineTokenizer = new LineTokenizer(input);
 	}
 
 	public String parse() throws IOException {
-		LineTokenizer lineTokenizer = new LineTokenizer(input);
-		isInParagraph = false;
-		isInCodeBlock = false;
-		StringBuffer html = new StringBuffer();
-		lineTokenizer.readNext();
-		while (!lineTokenizer.isAtEnd()) {
-			String currentLine = lineTokenizer.getCurrentLine();
-			String lookAheadLine = lineTokenizer.lookAhead();
-			if (isBlank(currentLine)) {
-				doBlank(html, currentLine);
-			} else if (isCodeBlockLine(currentLine)) {
-				doCodeBlockLine(html, currentLine, lookAheadLine);
-			} else {
-				doNonBlank(html, currentLine, lookAheadLine);
+		html = new StringBuffer();
+		while (!lookAhead().isEnd()) {
+			if (lookAhead().isParagraphLine()) {
+				doParagraph();
+			} else if (lookAhead().isBlankLine()) {
+				doBlankLine();
+			} else if (lookAhead().isCodeLine()) {
+				doCodeBlock();
 			}
-			lineTokenizer.readNext();
 		}
 		return html.toString();
 	}
 	
-	private boolean isBlank(String line) {
-		return line == null || line.trim().isEmpty();
+	private Token lookAhead() throws IOException {
+		return lineTokenizer.lookAhead();
 	}
 	
-	private boolean isCodeBlockLine(String line) {
-		return line.startsWith(CODE_BLOCK_LINE_PREFIX) && !line.trim().isEmpty();
-	}
-
-	private void doBlank(StringBuffer html, String currentLine) {
-		html.append(currentLine + "\n");
+	private Token getNextToken() throws IOException{
+		return lineTokenizer.getNextToken();
 	}
 	
-	private void doCodeBlockLine(StringBuffer html, String currentLine, String lookAheadLine) {
-		String processedLine = processCodeBlockLine(currentLine);
-		if (isInCodeBlock) {
-			if (isBlank(lookAheadLine)) {
-				html.append(processedLine + CODE_BLOCK_END + "\n");
-				isInCodeBlock = false;
-			} else {
-				html.append(processedLine + "\n");
-			}
-		} else {
-			if (isBlank(lookAheadLine)) {
-				html.append(CODE_BLOCK_START + processedLine + CODE_BLOCK_END + "\n");
-			} else {
-				html.append(CODE_BLOCK_START + processedLine + "\n");
-				isInCodeBlock = true;
-			}
+	private void doParagraph() throws IOException {
+		html.append(PARAGRAPH_START);
+		html.append(getNextToken().getText());
+		while (lookAhead().isParagraphLine()) {
+			html.append("\n");
+			html.append(getNextToken().getText());
 		}
+		html.append(PARAGRAPH_END + "\n");
+	}
+	
+	private void doBlankLine() throws IOException {
+		html.append("\n");
+		getNextToken();
+	}
+	
+	private void doCodeBlock() throws IOException {
+		html.append(CODE_BLOCK_START);
+		html.append(processCodeLine(getNextToken()));
+		while (lookAhead().isCodeLine()) {
+			html.append("\n");
+			html.append(processCodeLine(getNextToken()));
+		}
+		html.append(CODE_BLOCK_END + "\n");
 	}
 
-	private String processCodeBlockLine(String currentLine) {
+	private String processCodeLine(Token token) {
 		// TODO escape HTML characters
-		return currentLine.substring(CODE_BLOCK_LINE_PREFIX.length());
+		return token.getText();
 	}
 
-	private void doNonBlank(StringBuffer html, String currentLine, String lookAheadLine) {
-		if (isInParagraph) {
-			if (isBlank(lookAheadLine)) {
-				html.append(currentLine + PARAGRAPH_END + "\n");
-				isInParagraph = false;
-			} else {
-				html.append(currentLine + "\n");
-			}
-		} else {
-			if (isBlank(lookAheadLine)) {
-				html.append(PARAGRAPH_START + currentLine + PARAGRAPH_END + "\n");
-			} else {
-				html.append(PARAGRAPH_START + currentLine + "\n");
-				isInParagraph = true;
-			}
-		}
-	}
-	
 }

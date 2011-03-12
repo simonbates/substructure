@@ -1,4 +1,12 @@
-* move classification of lines into Tokeniser and return tokens: (enum TokenType, String contents)
-* change MarkupParser to recursive descent style
+* Move markup classes into their own package and change line endings to Unix
+* Rename code lines to pre-formatted lines (<pre>) -- more general
+* Escape HTML characters in pre-formatted lines
+* Given a directory of files of markup and a target directory,
+  for each markup file, parse and write the generated HTML to a file
+  in the target directory
+* Complain about tabs in pre-formatted blocks?
+* Add parser support for bulleted lists
+* Add parser support for hyperlinks
+* Add templates to splice the generated HTML into
 * Gradle
 * FindBugs

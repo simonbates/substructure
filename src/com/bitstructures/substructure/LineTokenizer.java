@@ -5,43 +5,52 @@ import java.io.IOException;
 import java.io.Reader;
 
 public class LineTokenizer {
+	
+	private static final String CODE_BLOCK_LINE_PREFIX = "    ";
 
 	private BufferedReader bufferedReader;
 	private boolean isBeforeStart;
-	private boolean isAtEnd;
-	private String currentLine;
 	private String lookAheadLine;
 	
 	public LineTokenizer(Reader reader) {
-		this.bufferedReader = new BufferedReader(reader);
-		this.currentLine = null;
-		this.lookAheadLine = null;
-		this.isBeforeStart = true;
-		this.isAtEnd = false;
+		bufferedReader = new BufferedReader(reader);
+		isBeforeStart = true;
+		lookAheadLine = null;
 	}
 	
-	public void readNext() throws IOException {
-		if (isBeforeStart) {
-			currentLine = bufferedReader.readLine();
-			isBeforeStart = false;
-		} else {
-			currentLine = lookAheadLine;
-		}
+	public Token getNextToken() throws IOException {
+		Token token = lookAhead();
+		readNextLine();
+		return token;
+	}
+	
+	public Token lookAhead() throws IOException {
+		readNextLineIfBeforeStart();
+		return buildTokenForLookAheadLine();
+	}
+	
+	private void readNextLine() throws IOException {
 		lookAheadLine = bufferedReader.readLine();
-		if (currentLine == null) {
-			isAtEnd = true;
+	}
+
+	private void readNextLineIfBeforeStart() throws IOException {
+		if (isBeforeStart) {
+			readNextLine();
+			isBeforeStart = false;
 		}
 	}
 	
-	public String getCurrentLine() {
-		return currentLine;
+	private Token buildTokenForLookAheadLine() {
+		if (lookAheadLine == null) {
+			return new Token(TokenType.END, null);
+		} else if (lookAheadLine.length() == 0) {
+			return new Token(TokenType.BLANK_LINE, lookAheadLine);
+		} else if (lookAheadLine.startsWith(CODE_BLOCK_LINE_PREFIX)) {
+			String codeLine = lookAheadLine.substring(CODE_BLOCK_LINE_PREFIX.length());
+			return new Token(TokenType.CODE_LINE, codeLine);
+		} else {
+			return new Token(TokenType.PARAGRAPH_LINE, lookAheadLine);
+		}
 	}
 	
-	public String lookAhead() {
-		return lookAheadLine;
-	}
-	
-	public boolean isAtEnd() {
-		return isAtEnd;
-	}
 }
